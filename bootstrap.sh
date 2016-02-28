@@ -9,11 +9,11 @@ if [ -z "$CONFD_BACKEND" ]; then
 fi
 
 if [ "$CONFD_BACKEND" == "etcd" ]; then
-  if [ -z "$ETCD_NODE" ]; then
-    echo "ETCD_NODE environment variable not set. Exiting..."
+  if [ -z "$ETCD_HOST" ]; then
+    echo "ETCD_HOST environment variable not set. Exiting..."
     exit 1
   fi
-  CONFD_PARAMS="-backend etcd -node http://$ETCD_NODE"
+  CONFD_PARAMS="-backend etcd -node http://$ETCD_HOST"
 else
   echo "confd backend not supported: $CONFD_BACKEND"
   exit 1
