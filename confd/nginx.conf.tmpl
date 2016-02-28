@@ -17,7 +17,7 @@ server {
     listen {{ index $service 1 }};
     server_name {{ index $service 0 }};
     location / {
-        proxy_pass {{ index $service 0 }};
+        proxy_pass http://{{ index $service 0 }};
     }
 }
 {{end}}
