@@ -19,6 +19,15 @@ else
   exit 1
 fi
 
+echo "[nginx] starting nginx service..."
+/usr/sbin/service nginx start
+sleep 2
+
+if [ $(ps -ef | grep -v grep | grep nginx | wc -l) == 0 ]; then
+  echo "nginx not running. Exiting..."
+  exit 1
+fi
+
 # Launch it one time to see if it configured correctly
 confd -onetime $CONFD_PARAMS -config-file ${TOML}
 if [ $? != 0 ]; then
@@ -26,9 +35,5 @@ if [ $? != 0 ]; then
   exit 1
 fi
 
-confd -interval 10 $CONFD_PARAMS -config-file ${TOML} &
-echo "[nginx] confd is now monitoring etcd for changes..."
-
-# Start the Nginx service using the generated config
-echo "[nginx] starting nginx service..."
-exec /usr/sbin/nginx -g 'daemon off;'
+echo "[nginx] Starting confd and monitoring etcd for changes..."
+confd -interval 10 $CONFD_PARAMS -config-file ${TOML}
