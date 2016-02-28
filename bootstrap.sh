@@ -13,21 +13,21 @@ if [ "$CONFD_BACKEND" == "etcd" ]; then
     echo "ETCD_NODE environment variable not set. Exiting..."
     exit 1
   fi
-
-  #launch it one time to see if it fails
-  confd -onetime -backend etcd -node http://$ETCD_NODE -config-file ${TOML}
-  if [ $? != 0 ]; then
-    echo "Error running confd"
-    exit 1
-  fi
-
-  confd -interval 10 -backend etcd -node http://$ETCD_NODE &
-  echo "[nginx] confd is now monitoring etcd for changes..."
-
+  CONFD_PARAMS="-backend etcd -node http://$ETCD_NODE"
 else
   echo "confd backend not supported: $CONFD_BACKEND"
   exit 1
 fi
+
+# Launch it one time to see if it configured correctly
+confd -onetime $CONFD_PARAMS -config-file ${TOML}
+if [ $? != 0 ]; then
+  echo "Error running confd"
+  exit 1
+fi
+
+confd -interval 10 $CONFD_PARAMS -config-file ${TOML} &
+echo "[nginx] confd is now monitoring etcd for changes..."
 
 # Start the Nginx service using the generated config
 echo "[nginx] starting nginx service..."
